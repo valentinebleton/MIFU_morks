@@ -1,22 +1,24 @@
 var xlsx = require('node-xlsx');
 var fs = require('fs');
-var mifuHelpers = require('./mifuHelpersNew.js');
+var mifuHelpers = require('./helpers/mifuHelpersNew.js');
+var instrumentHelpers = require('./helpers/instrumentHelpers.js');
+var vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 
-var vdb = xlsx.parse('Extrait_VDB.xlsx');
+var vdb = xlsx.parse('./sourceFiles/Extrait_VDB.xlsx');
 vdb[0].data.shift();
-var spi = xlsx.parse('Extrait_SPI.xlsx');
+var spi = xlsx.parse('./sourceFiles/Extrait_SPI.xlsx');
 spi[0].data.shift();
-var pdms = xlsx.parse('Extrait_PDMS.xls');
+var pdms = xlsx.parse('./sourceFiles/Extrait_PDMS.xls');
 pdms[0].data.shift();
-var previousMIFU = xlsx.parse('previous_MIFU.xlsx');
+var previousMIFU = xlsx.parse('./sourceFiles/previous_MIFU.xlsx');
 previousMIFU[0].data.shift();
 
 //if (typeof previousMIFU == 'undefined') {
   var tempData = [];
 //}
 
-var vendorDocs = mifuHelpers.importVendorDocs(vdb[0].data);
-var Instruments = mifuHelpers.importInstruments(spi[0].data, pdms[0].data, previousMIFU[0].data);
+var vendorDocs = vendorDocHelpers.importVendorDocs(vdb[0].data);
+var Instruments = instrumentHelpers.importInstruments(spi[0].data, pdms[0].data, previousMIFU[0].data);
 
 var tempData = Instruments.map(function(inst) {return(mifuHelpers.newFunc(inst, vendorDocs))});
 
@@ -31,7 +33,7 @@ var res = [
 res[0].data = res[0].data.concat(tempData);
 var buffer = xlsx.build(res);
 
-fs.writeFile('MIFU_report_new.xlsx', buffer, function(err) {
+fs.writeFile('./output/MIFU_report_new.xlsx', buffer, function(err) {
     if(err) {
         return console.log(err);
     }
