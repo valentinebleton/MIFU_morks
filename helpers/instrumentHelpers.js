@@ -41,7 +41,7 @@ var importInstruments = function(spiData, pdmsData, previousMIFU) {
       var pdmsStatus = '';
     };
 
-    var newInstrum = new Instrument(line[0],line[10],pdmsStatus,[forecastDate2, forecastDate3]);
+    var newInstrum = new Instrument(line[0],line[10], pdmsStatus, [forecastDate2, forecastDate3]);
     return  newInstrum;
   });
   return newLines;
