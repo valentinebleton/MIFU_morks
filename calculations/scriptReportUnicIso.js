@@ -53,9 +53,4 @@ res[0].data = res[0].data.concat(tempData[0]);
 res[1].data = res[1].data.concat(tempData[1]);
 var buffer = xlsx.build(res);
 
-fs.writeFileSync('./output/'.concat(unicIsoName).concat('_Unic_Iso_report.xlsx'), buffer, function(err) {
-    if(err) {
-        return console.log(err);
-    }
-    console.log("The file was saved!");
-});
+fs.writeFileSync('./output/'.concat(unicIsoName).concat('_Unic_Iso_report.xlsx'), buffer);

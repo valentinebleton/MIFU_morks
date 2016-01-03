@@ -1,4 +1,4 @@
-var MIFU = require('./calculations/ScriptReportNew.js');
+var MIFU = require('./ScriptReportNew.js');
 
 var vdbPath = __dirname + '/sourceFiles/Extrait_VDB.xlsx';
 var spiPath = __dirname + '/sourceFiles/Extrait_SPI.xlsx';

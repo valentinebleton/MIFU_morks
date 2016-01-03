@@ -30,12 +30,7 @@ var generateMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, target
   res[0].data = res[0].data.concat(tempData);
   var buffer = xlsx.build(res);
 
-  fs.writeFileSync(targetPath, buffer, function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
-  });
+  fs.writeFileSync(targetPath, buffer);
 
   return 'OK';
 }
