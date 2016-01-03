@@ -43,11 +43,6 @@ app.get('/genMIFU', function (req, res) {
 
 });
 
-app.get('/download', function(req, res){
-  var file = __dirname + '/workdir/input/Extrait_PDMS.xls';
-  res.download(file); // Set disposition and send it.
-});
-
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
