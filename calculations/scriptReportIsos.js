@@ -43,7 +43,7 @@ var res = [
 res[0].data = res[0].data.concat(tempData);
 var buffer = xlsx.build(res);
 
-fs.writeFile('./output/ISO_MIFU_report.xlsx', buffer, function(err) {
+fs.writeFileSync('./output/ISO_MIFU_report.xlsx', buffer, function(err) {
     if(err) {
         return console.log(err);
     }

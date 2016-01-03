@@ -17,7 +17,7 @@ function VendorDoc(ref, revisions) {
 VendorDoc.prototype.calculateLatestRevision = function () {
   var revs = this.revisions;
   this.latestRevision = revs.filter(function(rev) {
-    return rev.date == Math.max(...revs.map(function(r) {return r.date}));
+    return rev.date == Math.max.apply(null, revs.map(function(r) {return r.date}));
   })[0];
 };
 

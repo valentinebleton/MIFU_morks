@@ -53,7 +53,7 @@ res[0].data = res[0].data.concat(tempData[0]);
 res[1].data = res[1].data.concat(tempData[1]);
 var buffer = xlsx.build(res);
 
-fs.writeFile('./output/'.concat(unicIsoName).concat('_Unic_Iso_report.xlsx'), buffer, function(err) {
+fs.writeFileSync('./output/'.concat(unicIsoName).concat('_Unic_Iso_report.xlsx'), buffer, function(err) {
     if(err) {
         return console.log(err);
     }

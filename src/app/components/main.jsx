@@ -19,8 +19,11 @@ const Main = React.createClass({
 
   getInitialState() {
     return {
-      muiTheme: ThemeManager.getMuiTheme(LightRawTheme),
-      open: false,
+      VDBLoaded: false,
+      SPILoaded: false,
+      PDMSLoade: false,
+      previousMIFULoaded: false,
+      MIFUExists: true,
     };
   },
 
@@ -32,7 +35,6 @@ const Main = React.createClass({
       req.attach('file', file, file.name);
     });
     req.end(function(err, response) {
-      console.log(response);
       self.setState({open: true});
     });
   },
@@ -41,23 +43,13 @@ const Main = React.createClass({
 
     const self = this;
 
-    const standardActions = (
-      <FlatButton
-        label="Okey"
-        secondary={true}
-        onTouchTap={this._handleRequestClose}
-      />
+    let MIFUDL = (
+      <span></span>
     );
 
-
-
-    let testVar = (
-      <span>AAA</span>
-    );
-
-    if (this.state.open) {
-      testVar = (
-        <span>BBB</span>
+    if (this.state.MIFUExists) {
+      MIFUDL = (
+        <RaisedButton linkButton={true} href="http://localhost:8888/genMIFU" secondary={true} label="Download MIFU Report" />
       );
     }
 
@@ -76,7 +68,11 @@ const Main = React.createClass({
         <Dropzone onDrop={self.onDrop}>
           <div>Upload PDMS File Here</div>
         </Dropzone>
-        {testVar}
+        <h2>Previous MIFU File</h2>
+        <Dropzone onDrop={self.onDrop}>
+          <div>Upload Previous MIFU File Here</div>
+        </Dropzone>
+        {MIFUDL}
       </div>
     );
   },

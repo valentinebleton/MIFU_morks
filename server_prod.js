@@ -3,6 +3,8 @@ var multer  = require('multer');
 var fs = require('fs');
 var cors = require('cors');
 var app = express();
+var path = require('path');
+var MIFU = require('./calculations/ScriptReportNew.js');
 
 app.options('*', cors());
 
@@ -20,11 +22,32 @@ var storage = multer.diskStorage({
 var upload = multer({ dest: './', storage: storage})
 
 app.post('/uploadSourceFile', upload.any(), function(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    console.log(req.files); // form files
-    res.send('plop');
-    res.status(204).end();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  console.log(req.files[0].originalname);
+  fs.renameSync('./'+req.files[0].originalname, './workdir/input/'+req.files[0].originalname)
+  res.send('plop');
+  res.status(204).end();
 });
+
+app.get('/genMIFU', function (req, res) {
+  var vdbPath = __dirname + '/workdir/input/Extrait_VDB.xlsx';
+  var spiPath = __dirname + '/workdir/input/Extrait_SPI.xlsx';
+  var pdmsPath = __dirname + '/workdir/input/Extrait_PDMS.xls';
+  var previousMIFUPath = __dirname + '/workdir/input/previous_MIFU.xlsx';
+
+  var targetPath = __dirname + '/workdir/output/newMIFU.xlsx';
+
+  var statusMIFU = MIFU.generateMIFU(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath);
+
+  res.download(targetPath); // Set disposition and send it.
+
+});
+
+app.get('/download', function(req, res){
+  var file = __dirname + '/workdir/input/Extrait_PDMS.xls';
+  res.download(file); // Set disposition and send it.
+});
+
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
