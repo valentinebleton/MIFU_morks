@@ -5,18 +5,19 @@ var instrumentHelpers = require('./helpers/instrumentHelpers.js');
 var vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 var isometricHelpers = require('./helpers/isometricHelpers.js');
 
-var vdb = xlsx.parse('./sourceFiles/Extrait_VDB.xlsx');
-vdb[0].data.shift();
-var spi = xlsx.parse('./sourceFiles/Extrait_SPI.xlsx');
-spi[0].data.shift();
-var pdms = xlsx.parse('./sourceFiles/Extrait_PDMS.xls');
-pdms[0].data.shift();
-var bom = xlsx.parse('./sourceFiles/BOM.xlsx');
-bom[0].data.shift();
-var impactedIso = xlsx.parse('./sourceFiles/Impacted_iso.xlsx');
-impactedIso[0].data.shift();
-var previousMIFU = xlsx.parse('./sourceFiles/previous_MIFU.xlsx');
-previousMIFU[0].data.shift();
+var generateIsoMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath) {
+  var vdb = xlsx.parse(vdbPath);
+  vdb[0].data.shift();
+  var spi = xlsx.parse(spiPath);
+  spi[0].data.shift();
+  var pdms = xlsx.parse(pdmsPath);
+  pdms[0].data.shift();
+  var bom = xlsx.parse(bomPath);
+  bom[0].data.shift();
+  var impactedIso = xlsx.parse(impactedIsoPath);
+  impactedIso[0].data.shift();
+  var previousMIFU = xlsx.parse(previousMIFUPath);
+  previousMIFU[0].data.shift();
 
 var unicIsoName = 'P00-30-HL-1020-0062-BD20H-HF1-1';
 
@@ -53,4 +54,10 @@ res[0].data = res[0].data.concat(tempData[0]);
 res[1].data = res[1].data.concat(tempData[1]);
 var buffer = xlsx.build(res);
 
-fs.writeFileSync('./output/'.concat(unicIsoName).concat('_Unic_Iso_report.xlsx'), buffer);
+fs.writeFileSync(targetPath, buffer);
+return 'OK';
+}
+
+module.exports = {
+  generateIsoUnicMIFU : generateIsoUnicMIFU
+};
