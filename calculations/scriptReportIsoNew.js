@@ -5,7 +5,7 @@ var instrumentHelpers = require('./helpers/instrumentHelpers.js');
 var vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 var isometricHelpers = require('./helpers/isometricHelpers.js');
 
-var generateIsoMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath) {
+var generateIsoMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, bomPath, impactedIsoPath, targetPath) {
   var vdb = xlsx.parse(vdbPath);
   vdb[0].data.shift();
   var spi = xlsx.parse(spiPath);
