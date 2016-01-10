@@ -1,3 +1,4 @@
+var g = require('./globalHelpers.js');
 
 function VendorDoc(ref, revisions) {
   this.ref = ref;
@@ -5,7 +6,7 @@ function VendorDoc(ref, revisions) {
   this.statusCodes = [1,2,3].map(function(n) {
     var dateStatusCode = 0;
     revisions.forEach(function(rev) {
-      if ((rev.date > dateStatusCode) && ( rev.statusCode == n ) ) {
+      if ((rev.date.getTime() > dateStatusCode) && ( rev.statusCode == n ) ) {
         dateStatusCode = rev.date;
       }
     });
@@ -16,8 +17,10 @@ function VendorDoc(ref, revisions) {
 
 VendorDoc.prototype.calculateLatestRevision = function () {
   var revs = this.revisions;
-  this.latestRevision = revs.filter(function(rev) {
-    return rev.date == Math.max.apply(null, revs.map(function(r) {return r.date}));
+  var self = this;
+  var maxDate = new Date(Math.max.apply(null, revs.map(function(r) {return r.date})));
+  this.latestRevision = revs.filter(function(rev,ind,arr) {
+    return rev.date.getTime() == maxDate.getTime();
   })[0];
 };
 
@@ -29,26 +32,27 @@ function Revision(number, date, statusCode) {
 
 var importVendorDocs = function(vdbData) {
   var newVendorDocs = [];
-  vdbData.forEach(function(line) {
+  vdbData.forEach(function(vd) {
     var i = 0;
     var l = newVendorDocs.length;
     var index = -1;
     for(i = 0; i < l; i++) {
-      if (newVendorDocs[i].ref == line[0]) {
+      if (newVendorDocs[i].ref == vd['Doc_Client_Reference']) {
           index = i;
           break;
       }
     }
     if (index < 0) {
-      if ((typeof line[2] != 'undefined') && (typeof line[3] != 'undefined')) {
-        var revision = new Revision(line[2], line[3], line[5]);
-        var newVendorDoc = new VendorDoc(line[0], [revision]);
+      if ((typeof vd['Rev'] != 'undefined') && (typeof vd['Rev_Date'] != 'undefined')) {
+        //console.log(vd['Rev_Date']);
+        var revision = new Revision(vd['Rev'], g.dateImport(vd['Rev_Date']), vd['Doc_Status']);
+        var newVendorDoc = new VendorDoc(vd['Doc_Client_Reference'], [revision]);
         newVendorDocs.push(newVendorDoc);
       } else {
-        // console.log('Erreur : ligne VDB '+line[0]+' mal remplie');
+        // console.log('Erreur : ligne VDB '+vd['Doc_Client_Reference']+' mal remplie');
       }
     } else {
-      var revision = new Revision(line[2], line[3], line[5]);
+      var revision = new Revision(vd['Rev'], g.dateImport(vd['Rev_Date']), vd['Doc_Status']);
       newVendorDocs[index].revisions.push(revision);
     }
   });
@@ -59,7 +63,5 @@ var importVendorDocs = function(vdbData) {
 }
 
 module.exports = {
-  importVendorDocs : importVendorDocs,
-  VendorDoc : VendorDoc,
-  Revision : Revision
+  importVendorDocs : importVendorDocs
 };

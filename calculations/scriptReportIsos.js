@@ -7,8 +7,7 @@ const vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 const g = require('./helpers/globalHelpers.js');
 const isometricHelpers = require('./helpers/isometricHelpers.js');
 
-let generateUnicISO = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPath, previousMIFUPath, targetPath, unicIsoName) {
-
+let generateISOS = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPath, previousMIFUPath, targetPath) {
   let vdbWorkbook = XLSX.readFileSync(vdbPath);
   let vdbData = XLSX.utils.sheet_to_json(vdbWorkbook.Sheets[vdbWorkbook.SheetNames[0]]);
   let spiWorkbook = XLSX.readFileSync(spiPath);
@@ -28,19 +27,16 @@ let generateUnicISO = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsos
   isometrics.forEach(function(isometric) {isometric.updateOnHoldCount(instruments, vendorDocs)});
   isometrics.forEach(function(isometric,ind, arr) {isometric.updateOnHoldImpactedIsoCount(arr)});
   isometrics.forEach(function(isometric) {isometric.updateIFCStatus()});
+  let tempData = isometrics.map(isometricHelpers.exportFunction);
 
-  // permet de remplir res[0]
-  let tempData = isometricHelpers.uniqueExportFunction(isometrics,instruments, vendorDocs, unicIsoName);
-
-  //console.log(tempData);
-
-  let buffer = g.json2xlsx([{jsonArray: tempData[0], sheetTitle: 'Instrum'}, {jsonArray: tempData[1], sheetTitle: 'Impacted Isos'}]);
+  let buffer = g.json2xlsx([{jsonArray: tempData, sheetTitle: 'Isometrics'}]);
 
   fs.writeFileSync(targetPath, buffer);
 
   return 'OK';
+
 }
 
 module.exports = {
-  generateUnicISO : generateUnicISO,
+  generateISOS : generateISOS,
 };

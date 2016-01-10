@@ -23,6 +23,7 @@ Isometric.prototype.updateOnHoldCount = function (instruments, vendorDocs) {
       var relatedInstrument = instruments.filter(function(instrum) {
         return instrum.tag == relatedTag;
       })[0];
+
       if (typeof relatedInstrument != 'undefined') {
         var relatedvendorDoc = vendorDocs.filter(function(vendorDoc) {
           return vendorDoc.ref == relatedInstrument.gad;
@@ -66,32 +67,32 @@ Isometric.prototype.updateIFCStatus = function () {
 };
 
 var importIsometrics = function(bomData, pdmsData, impactedIsoData) {
-  var listIsoNames = bomData.map(function(l) {
-    return l[4];
+  var listIsoNames = bomData.map(function(bomObj) {
+    return bomObj['Isometric'];
   }).unique();
 
   var newLines = listIsoNames.map(function(name) {
     // impacted Iso
-    var a = impactedIsoData.filter(function(impactedIsoLine) {
-      return (impactedIsoLine[0] == name);
+    var a = impactedIsoData.filter(function(impactedIsoObj) {
+      return (impactedIsoObj['Isometric'] == name);
     });
 
     if (typeof a != 'undefined') {
-      var listImpactedIso = a.map(function(l) {
-        return {impactedIso : l[4], impactingTag: l[1]};
+      var listImpactedIso = a.map(function(isoObj) {
+        return {impactedIso : isoObj['Impacted isometric'], impactingTag: isoObj['Isometric']};
       });
     } else {
       var listImpactedIso = [];
     };
 
     // related tags
-    var b = pdmsData.filter(function(relatedTagLine) {
-      return (relatedTagLine[3] == name);
+    var b = pdmsData.filter(function(relatedTagObj) {
+      return (relatedTagObj['PIPE'] == name);
     });
 
     if (typeof b != 'undefined') {
-      var listRelatedTags = b.map(function(l) {
-        return l[0];
+      var listRelatedTags = b.map(function(pdmsObj) {
+        return pdmsObj['NAME'];
       });
     } else {
       var listRelatedTags = [];
@@ -118,21 +119,34 @@ var uniqueExportFunction = function(isometrics, instruments, vendorDocs, isoName
     var relatedVendorDoc = vendorDocs.filter(function(vendorDoc) {
       return vendorDoc.ref == relatedTag.gad;
     })[0];
-    return [relatedTag.tag, relatedVendorDoc.latestRevision.statusCode, relatedTag.pdmsStatus]
+    return {
+      'Tag' : relatedTag.tag,
+      'Status VDB' : relatedVendorDoc.latestRevision.statusCode,
+      'Status PDMS' : relatedTag.pdmsStatus,
+    };
   });
-
 
   var temp2 = targetedIso.impactedIsometrics.map(function(iso) {
     var impactedIso = isometrics.filter(function(is) {
       return is.name == iso.impactedIso;
     })[0];
-    return [iso.impactedIso, iso.impactingTag , impactedIso.IFCStatus]
+    return {
+      'Impacted isometric' : iso.impactedIso,
+      'tag of impacting element' : iso.impactingTag,
+      'global status of impacted isometric' : impactedIso.IFCStatus,
+    };
   });
+
   return [temp1, temp2];
 }
 
 var exportFunction = function(isometric) {
-  return [isometric.name,isometric.onHoldCount,isometric.onHoldImpactedIsoCount, isometric.IFCStatus];
+  return {
+    'Isometric' : isometric.name,
+    'number of HOLD on iso' : isometric.onHoldCount,
+    'Status of impacted isometrics' : isometric.onHoldImpactedIsoCount,
+    'IFC ready' : isometric.IFCStatus,
+  };
 }
 
 
