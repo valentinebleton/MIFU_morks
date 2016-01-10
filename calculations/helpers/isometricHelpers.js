@@ -1,3 +1,4 @@
+var g = require('./globalHelpers.js');
 
 Array.prototype.unique = function() {
     var o = {}, i, l = this.length, r = [];
@@ -13,6 +14,7 @@ function Isometric(name, relatedTags, impactedIsometrics) {
   this.onHoldCount = 0;
   this.onHoldImpactedIsoCount = 0;
   this.IFCStatus = '';
+  this.forecastDatesCompiled = '';
 }
 
 Isometric.prototype.updateOnHoldCount = function (instruments, vendorDocs) {
@@ -66,6 +68,40 @@ Isometric.prototype.updateIFCStatus = function () {
   }
 };
 
+Isometric.prototype.updateForecastDatesCompiled = function (instruments) {
+  var self = this;
+  if (self.IFCStatus == '') {
+    if (self.relatedTags.length > 0) {
+      self.forecastDatesCompiled = [2,3].map(function(statusCode) {
+        var latestDates = self.relatedTags.map(function(relatedTag) {
+          var relatedInstrument = instruments.filter(function(instrum) {
+            return instrum.tag == relatedTag;
+          })[0];
+          if (typeof relatedInstrument != 'undefined') {
+            return relatedInstrument.forecastDates.filter(function(fD) {return fD.statusCode == statusCode})[0].latestDate;
+          } else {
+            return 0;
+          }
+        });
+
+        if (latestDates != 0) {
+          var maxDate = new Date(Math.max.apply(null, latestDates));
+          if (maxDate.getTime() == 0) {
+            maxDate = 0; // TODO : voir pourquoi cela peut arriver
+          }
+        } else {
+          var maxDate = 0;
+        }
+
+        return {
+          statusCode : statusCode,
+          forecastDate: maxDate,
+        };
+      });
+    }
+  }
+};
+
 var importIsometrics = function(bomData, pdmsData, impactedIsoData) {
   var listIsoNames = bomData.map(function(bomObj) {
     return bomObj['Isometric'];
@@ -104,6 +140,8 @@ var importIsometrics = function(bomData, pdmsData, impactedIsoData) {
   return newLines;
 }
 
+
+
 // fonction d'import pour un isométrique unique appelé IsoName
 var uniqueExportFunction = function(isometrics, instruments, vendorDocs, isoName) {
   var targetedIso = isometrics.filter(function(iso) {
@@ -141,11 +179,20 @@ var uniqueExportFunction = function(isometrics, instruments, vendorDocs, isoName
 }
 
 var exportFunction = function(isometric) {
+  if (isometric.forecastDatesCompiled != '') {
+    var forecastDate2 = isometric.forecastDatesCompiled.filter(function(fD) {return (fD.statusCode == 2);})[0].forecastDate;
+    var forecastDate3 = isometric.forecastDatesCompiled.filter(function(fD) {return (fD.statusCode == 3);})[0].forecastDate;
+  } else {
+    var forecastDate2 = 0;
+    var forecastDate3 = 0;
+  }
   return {
     'Isometric' : isometric.name,
     'number of HOLD on iso' : isometric.onHoldCount,
     'Status of impacted isometrics' : isometric.onHoldImpactedIsoCount,
     'IFC ready' : isometric.IFCStatus,
+    'Synthesis forecast date status 2' : g.dateExport(forecastDate2),
+    'Synthesis forecast date status 3' : g.dateExport(forecastDate3),
   };
 }
 

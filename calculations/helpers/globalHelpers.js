@@ -21,14 +21,11 @@ var dateExport = function(date) {
 var json2xlsx = function(preWorksheets) {
 
   var ress = preWorksheets.map(function(preWorksheet) {
-    //console.log(preWorksheet);
     var titles = [Object.keys(preWorksheet.jsonArray[0])];
-    //console.log(titles);
     var data = preWorksheet.jsonArray.map(function(jsonObj) {
       return titles[0].map(function(key) { return jsonObj[key]});
     });
     var allData = titles.concat(data);
-    // console.log(allData);
     var res = {
         name: preWorksheet.sheetTitle,
         data: allData,

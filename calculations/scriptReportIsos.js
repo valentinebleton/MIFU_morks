@@ -27,6 +27,7 @@ let generateISOS = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPat
   isometrics.forEach(function(isometric) {isometric.updateOnHoldCount(instruments, vendorDocs)});
   isometrics.forEach(function(isometric,ind, arr) {isometric.updateOnHoldImpactedIsoCount(arr)});
   isometrics.forEach(function(isometric) {isometric.updateIFCStatus()});
+  isometrics.forEach(function(isometric) {isometric.updateForecastDatesCompiled(instruments)});
   let tempData = isometrics.map(isometricHelpers.exportFunction);
 
   let buffer = g.json2xlsx([{jsonArray: tempData, sheetTitle: 'Isometrics'}]);
