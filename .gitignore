@@ -4,7 +4,7 @@ output
 node_modules
 projet
 build
-workdir
+workdir*
 build_backend
 calculations/*.bat
 electron-quick-start-master

@@ -1,6 +1,6 @@
 var express = require('express');
 var multer  = require('multer');
-var fs = require('fs');
+var fs = require('fs-extra');
 var cors = require('cors');
 var expressApp = express();
 var path = require('path');
@@ -24,6 +24,15 @@ var storage = multer.diskStorage({
 });
 
 var upload = multer({ dest: './', storage: storage})
+
+expressApp.get('/wipeAll', function(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  fs.emptyDirSync(__dirname+'/workdir/input');
+  fs.emptyDirSync(__dirname+'/workdir/output');
+  res.send('plop');
+  res.status(200).end();
+});
+
 
 expressApp.post('/uploadSourceFile', upload.any(), function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -77,7 +86,7 @@ app.on('ready', function() {
   mainWindow.loadURL('http://localhost:8888');
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
