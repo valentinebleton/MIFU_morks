@@ -30,7 +30,7 @@ function Revision(number, date, statusCode) {
   this.statusCode = statusCode;
 }
 
-var importVendorDocs = function(vdbData) {
+var importVendorDocs = function(vdbData, logger) {
   var newVendorDocs = [];
   vdbData.forEach(function(vd) {
     var i = 0;
@@ -49,7 +49,7 @@ var importVendorDocs = function(vdbData) {
         var newVendorDoc = new VendorDoc(vd['Doc_Client_Reference'], [revision]);
         newVendorDocs.push(newVendorDoc);
       } else {
-        // console.log('Erreur : ligne VDB '+vd['Doc_Client_Reference']+' mal remplie');
+        logger.warn(vd['Doc_Client_Reference']+' data in VDB is wrongly filled');
       }
     } else {
       var revision = new Revision(vd['Rev'], g.dateImport(vd['Rev_Date']), vd['Doc_Status']);

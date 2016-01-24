@@ -2,12 +2,25 @@
 
 const XLSX = require('xlsx');
 const fs = require('fs');
-const exportHelpers = require('./helpers/exportHelpers.js');
 const instrumentHelpers = require('./helpers/instrumentHelpers.js');
 const vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 const g = require('./helpers/globalHelpers.js');
+const log4js = require('log4js');
+log4js.configure({
+  appenders: [
+    { type: 'console' },
+    { type: 'file',
+      filename: './output/reportErrorsNew.log',
+      category: 'mifu',
+    },
+  ]
+});
 
 let generateMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath) {
+
+  let logger = log4js.getLogger('lostData');
+  logger.setLevel('ALL');
+
   let vdbWorkbook = XLSX.readFileSync(vdbPath);
   let vdbData = XLSX.utils.sheet_to_json(vdbWorkbook.Sheets[vdbWorkbook.SheetNames[0]]);
   let spiWorkbook = XLSX.readFileSync(spiPath);
@@ -17,9 +30,9 @@ let generateMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, target
   let previousMIFUWorkbook = XLSX.readFileSync(previousMIFUPath);
   let previousMIFUData = XLSX.utils.sheet_to_json(previousMIFUWorkbook.Sheets[previousMIFUWorkbook.SheetNames[0]]);
 
-  let vendorDocs = vendorDocHelpers.importVendorDocs(vdbData);
-  let Instruments = instrumentHelpers.importInstruments(spiData, pdmsData, previousMIFUData);
-  let tempData = Instruments.map(function(inst) {return(exportHelpers.MIFU(inst, vendorDocs))});
+  let vendorDocs = vendorDocHelpers.importVendorDocs(vdbData, logger);
+  let Instruments = instrumentHelpers.importInstruments(spiData, pdmsData, previousMIFUData, logger);
+  let tempData = Instruments.map(function(inst) {return(instrumentHelpers.exportMIFU(inst, vendorDocs, logger))});
 
   let buffer = g.json2xlsx([{jsonArray: tempData, sheetTitle: 'Instrum'}]);
 

@@ -17,7 +17,7 @@ function Isometric(name, relatedTags, impactedIsometrics) {
   this.forecastDatesCompiled = '';
 }
 
-Isometric.prototype.updateOnHoldCount = function (instruments, vendorDocs) {
+Isometric.prototype.updateOnHoldCount = function (instruments, vendorDocs, logger) {
   var self = this;
   var onHoldCount = 0;
   if (this.relatedTags.length > 0) {
@@ -40,6 +40,7 @@ Isometric.prototype.updateOnHoldCount = function (instruments, vendorDocs) {
         }
       } else {
         onHoldCount++;
+        logger.warn(this.relatedTags +' missing in PDMS File');
         // TODO : gérer le cas où le tag est dans le PDMS et pas dans le SPI
       }
     });
@@ -68,7 +69,7 @@ Isometric.prototype.updateIFCStatus = function () {
   }
 };
 
-Isometric.prototype.updateForecastDatesCompiled = function (instruments) {
+Isometric.prototype.updateForecastDatesCompiled = function (instruments, logger) {
   var self = this;
   if (self.IFCStatus == '') {
     if (self.relatedTags.length > 0) {
@@ -80,14 +81,17 @@ Isometric.prototype.updateForecastDatesCompiled = function (instruments) {
           if (typeof relatedInstrument != 'undefined') {
             return relatedInstrument.forecastDates.filter(function(fD) {return fD.statusCode == statusCode})[0].latestDate;
           } else {
-            return 0;
+            logger.warn(self.relatedTags +' missing in PDMS File');
+
           }
         });
 
         if (latestDates != 0) {
           var maxDate = new Date(Math.max.apply(null, latestDates));
           if (maxDate.getTime() == 0) {
-            maxDate = 0; // TODO : voir pourquoi cela peut arriver
+            maxDate = 0;
+            logger.eror(self.relatedTags +' no proper forecast date settled');
+            //TODO : voir pourquoi cela peut arriver
           }
         } else {
           var maxDate = 0;
@@ -102,7 +106,7 @@ Isometric.prototype.updateForecastDatesCompiled = function (instruments) {
   }
 };
 
-var importIsometrics = function(bomData, pdmsData, impactedIsoData) {
+var importIsometrics = function(bomData, pdmsData, impactedIsoData, logger) {
   var listIsoNames = bomData.map(function(bomObj) {
     return bomObj['Isometric'];
   }).unique();
@@ -119,6 +123,7 @@ var importIsometrics = function(bomData, pdmsData, impactedIsoData) {
       });
     } else {
       var listImpactedIso = [];
+      logger.info(listIsoNames +' has no impact on other iso : to check');
     };
 
     // related tags
@@ -201,5 +206,5 @@ module.exports = {
   importIsometrics : importIsometrics,
   uniqueExportFunction : uniqueExportFunction,
   Isometric : Isometric,
-  exportFunction : exportFunction
+  exportFunction : exportFunction,
 };

@@ -6,8 +6,20 @@ const instrumentHelpers = require('./helpers/instrumentHelpers.js');
 const vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 const g = require('./helpers/globalHelpers.js');
 const isometricHelpers = require('./helpers/isometricHelpers.js');
+log4js.configure({
+  appenders: [
+    { type: 'console' },
+    { type: 'file',
+      filename: './output/reportErrorsIsoUnicNew.log',
+      category: 'isoMifuNew',
+    },
+  ]
+});
 
 let generateUnicISO = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPath, previousMIFUPath, targetPath, unicIsoName) {
+
+  let logger = log4js.getLogger('lostData');
+  logger.setLevel('ALL');
 
   let vdbWorkbook = XLSX.readFileSync(vdbPath);
   let vdbData = XLSX.utils.sheet_to_json(vdbWorkbook.Sheets[vdbWorkbook.SheetNames[0]]);
@@ -22,9 +34,9 @@ let generateUnicISO = function(vdbPath, spiPath, pdmsPath, bomPath, impactedIsos
   let previousMIFUWorkbook = XLSX.readFileSync(previousMIFUPath);
   let previousMIFUData = XLSX.utils.sheet_to_json(previousMIFUWorkbook.Sheets[previousMIFUWorkbook.SheetNames[0]]);
 
-  let vendorDocs = vendorDocHelpers.importVendorDocs(vdbData);
-  let instruments = instrumentHelpers.importInstruments(spiData, pdmsData, previousMIFUData);
-  let isometrics = isometricHelpers.importIsometrics(bomData, pdmsData, impactedIsosData);
+  let vendorDocs = vendorDocHelpers.importVendorDocs(vdbData, logger);
+  let instruments = instrumentHelpers.importInstruments(spiData, pdmsData, previousMIFUData, logger);
+  let isometrics = isometricHelpers.importIsometrics(bomData, pdmsData, impactedIsosData, logger);
   isometrics.forEach(function(isometric) {isometric.updateOnHoldCount(instruments, vendorDocs)});
   isometrics.forEach(function(isometric,ind, arr) {isometric.updateOnHoldImpactedIsoCount(arr)});
   isometrics.forEach(function(isometric) {isometric.updateIFCStatus()});

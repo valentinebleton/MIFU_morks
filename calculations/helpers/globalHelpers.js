@@ -1,7 +1,6 @@
 var nodeXlsx = require('node-xlsx');
 
 var dateImport = function(dateString) {
-  debugger;
   var dateParts = dateString.split(' ')[0].split('/');
   var date = new Date('20'+dateParts[2], (dateParts[0]-1), dateParts[1]);
   return date;
