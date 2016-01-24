@@ -36,7 +36,6 @@ expressApp.get('/wipeAll', function(req, res) {
 
 expressApp.post('/uploadSourceFile', upload.any(), function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  console.log(req.files[0].originalname);
   fs.renameSync('./'+req.files[0].originalname, __dirname+'/workdir/input/'+req.files[0].originalname)
   res.send('plop');
   res.status(204).end();
