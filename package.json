@@ -1,11 +1,8 @@
 {
-  "name": "material-ui-example-webpack",
+  "name": "my_MIFU_app",
   "version": "0.14.0",
-  "description": "Sample project that uses material-ui",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/callemall/material-ui.git"
-  },
+  "description": "MIFU app",
+  "main": "server_prod_elec.js",
   "scripts": {
     "start": "webpack-dev-server --config webpack-dev-server.config.js --progress --inline --colors",
     "build": "webpack --config webpack-production.config.js --progress --colors"

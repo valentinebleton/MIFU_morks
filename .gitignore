@@ -7,3 +7,5 @@ build
 workdir
 build_backend
 calculations/*.bat
+electron-quick-start-master
+*-win32-x64
