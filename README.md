@@ -1,7 +1,19 @@
 # MIFU_works
 
-MIFU works repo
+Run all commands in main directory.
 
-Command for building
+1) Install deps:
 
-electron-packager . elecapp2 --platform=win32 --arch=x64 --version=0.36.5 --ignore="node_modules/(babel*|eslint*|react-hot-loader|webpack*|html-webpack-plugin|transfer-webpack-plugin|gulp)
+npm install
+
+2) Command for installing electron-packager :
+
+npm install -g electron-packager
+
+3) Command for building :
+
+npm run build
+
+4) Command for packaging :
+
+electron-packager . appName --platform=win32 --arch=x64 --version=0.36.5 --ignore="node_modules/(babel*|eslint*|react-hot-loader|webpack*|html-webpack-plugin|transfer-webpack-plugin|gulp)
