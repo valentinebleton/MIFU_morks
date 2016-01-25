@@ -85,7 +85,7 @@ app.on('ready', function() {
   mainWindow.loadURL('http://localhost:8888');
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
