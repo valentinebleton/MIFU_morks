@@ -23,7 +23,6 @@ const divStyle = {
 const Main = React.createClass({
 
   getInitialState() {
-
     return {
       tabValue: 'MIFUupdate',
     };
