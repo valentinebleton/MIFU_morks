@@ -47,7 +47,12 @@ var config = {
         test: /\.(js|jsx)$/, //All .js and .jsx files
         loaders: ['babel'], //react-hot is like browser sync and babel loads jsx and es6-7
         exclude: [nodeModulesPath]
-      }
+      },
+      {
+        // loader for images
+        test: /\.(png|jpg)$/,
+        loader: 'file-loader'
+      },
     ]
   },
   //Eslint config

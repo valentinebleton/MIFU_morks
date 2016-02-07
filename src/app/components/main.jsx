@@ -5,6 +5,9 @@ import request from 'superagent';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+//import imgPath from 'test.jpg';
+
+const imgPath = require('./test.jpg');
 
 import MIFUComponent from './MIFUComponent';
 
@@ -42,6 +45,7 @@ const Main = React.createClass({
 
     return (
       <div>
+        <img src={imgPath} alt='header' />
         <div style={containerStyle}><h1>MIFU app</h1></div>
         <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
           <Tab label='MIFU initialisation' value='MIFUinit' >
