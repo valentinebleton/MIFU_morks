@@ -16,7 +16,7 @@ npm run build
 
 4) Command for packaging :
 
-electron-packager . appName --platform=win32 --arch=x64 --version=0.36.5 --ignore="node_modules/(babel*|eslint*|react-hot-loader|webpack*|html-webpack-plugin|transfer-webpack-plugin|gulp)
+electron-packager . testApp --platform=win32 --arch=x64 --version=0.36.5 --ignore="node_modules/(babel*|eslint*|react-hot-loader|webpack*|html-webpack-plugin|transfer-webpack-plugin|gulp)
 
 Developing :
 
