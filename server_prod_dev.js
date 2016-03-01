@@ -5,6 +5,8 @@ var cors = require('cors');
 var expressApp = express();
 var path = require('path');
 var MIFU = require('./calculations/ScriptReportNew.js');
+var ISOS = require('./calculations/ScriptReportIsos.js');
+var isoListHelper = require('./calculations/helpers/isoListHelper.js');
 
 expressApp.options('*', cors());
 
@@ -29,7 +31,6 @@ expressApp.get('/wipeAll', function(req, res) {
   res.status(200).end();
 });
 
-
 expressApp.post('/uploadSourceFile', upload.any(), function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   fs.renameSync('./'+req.files[0].originalname, __dirname+'/workdir/input/'+req.files[0].originalname)
@@ -43,14 +44,48 @@ expressApp.get('/genMIFU', function (req, res) {
   var pdmsPath = __dirname + '/workdir/input/Extrait_PDMS.xls';
   var previousMIFUPath = __dirname + '/workdir/input/previous_MIFU.xlsx';
 
-  var targetPath = __dirname + '/workdir/output/newMIFU.xlsx';
+  var MIFUtargetPath = __dirname + '/workdir/output/newMIFU.xlsx';
 
-  var statusMIFU = MIFU.generateMIFU(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath);
+  var statusMIFU = MIFU.generateMIFU(vdbPath, spiPath, pdmsPath, previousMIFUPath, MIFUtargetPath);
 
   res.download(targetPath); // Set disposition and send it.
 
 });
 
+expressApp.get('/genISOS', function (req, res) {
+  var vdbPath = __dirname + '/workdir/input/Extrait_VDB.xlsx';
+  var spiPath = __dirname + '/workdir/input/Extrait_SPI.xlsx';
+  var pdmsPath = __dirname + '/workdir/input/Extrait_PDMS.xls';
+  var previousMIFUPath = __dirname + '/workdir/input/previous_MIFU.xlsx';
+  var bomPath = __dirname + '/workdir/input/BOM.xlsx';
+  var impactedIsosPath = __dirname + '/workdir/input/Impacted_iso.xlsx';
+
+  var targetPath = __dirname + '/workdir/output/newISOstatus.xlsx';
+  var statusISOS = ISOS.generateISOS(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPath, previousMIFUPath, targetPath);
+
+  res.download(targetPath); // Set disposition and send it.
+});
+
+expressApp.get('/genISO', function (req, res) {
+  var vdbPath = __dirname + '/workdir/input/Extrait_VDB.xlsx';
+  var spiPath = __dirname + '/workdir/input/Extrait_SPI.xlsx';
+  var pdmsPath = __dirname + '/workdir/input/Extrait_PDMS.xls';
+  var previousMIFUPath = __dirname + '/workdir/input/previous_MIFU.xlsx';
+  var bomPath = __dirname + '/workdir/input/BOM.xlsx';
+  var impactedIsosPath = __dirname + '/workdir/input/Impacted_iso.xlsx';
+
+  var targetPath = __dirname + '/workdir/output/newISOstatus.xlsx';
+  var statusISOS = ISOS.generateISOS(vdbPath, spiPath, pdmsPath, bomPath, impactedIsosPath, previousMIFUPath, targetPath);
+
+  res.download(targetPath); // Set disposition and send it.
+});
+
+expressApp.get('/getIsoNameList', function (req, res) {
+  var bomPath = __dirname + '/workdir/input/BOM.xlsx';
+  var listIsoNames = isoListHelper.getIsoNameList(bomPath);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.send(listIsoNames); // Set disposition and send it.
+});
 
 var server = expressApp.listen(8888, function () {
   var host = server.address().address;

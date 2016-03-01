@@ -52,28 +52,42 @@ const DropDiv = React.createClass({
     if (this.props.fType === 'vdb') {
       fName = 'VDB';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.VDBLoaded === true) {
+      if (self.props.loadingState.vdb === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
     } else if (this.props.fType === 'spi') {
       fName = 'SPI';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.SPILoaded === true) {
+      if (self.props.loadingState.spi === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
     } else if (this.props.fType === 'pdms') {
       fName = 'PDMS';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.PDMSLoaded === true) {
+      if (self.props.loadingState.pdms === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
     } else if (this.props.fType === 'pMIFU') {
-      fName = 'previous MIFU';
+      fName = 'prev. inst. status';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.previousMIFULoaded === true) {
+      if (self.props.loadingState.pMIFU === true) {
+        style= dropZoneActiveStyle;
+        message = fName+' File Uploaded !';
+      }
+    } else if (this.props.fType === 'bom') {
+      fName = 'BOM';
+      message = 'Upload '+fName+' File Here';
+      if (self.props.loadingState.bom === true) {
+        style= dropZoneActiveStyle;
+        message = fName+' File Uploaded !';
+      }
+    } else if (this.props.fType === 'impactedIso') {
+      fName = 'Impacted isos';
+      message = 'Upload '+fName+' File Here';
+      if (self.props.loadingState.impactedIso === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }

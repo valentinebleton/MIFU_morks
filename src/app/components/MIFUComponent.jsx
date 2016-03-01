@@ -4,6 +4,8 @@ import Dropzone from 'react-dropzone';
 import request from 'superagent';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Colors from 'material-ui/lib/styles/colors';
+import DropDownMenu from 'material-ui/lib/DropDownMenu';
+import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import DropDiv from './DropDiv';
 
@@ -29,58 +31,98 @@ const MIFUComponent = React.createClass({
     });
 
     return {
-      loadingState: {
-        VDBLoaded: false,
-        SPILoaded: false,
-        PDMSLoaded: false,
-        previousMIFULoaded: false,
-      },
+      selectedIso: '',
+      listIsos: [],
     };
   },
 
+  getListIso() {
+    const self = this;
+    let req = request.get('http://localhost:8888/getIsoNameList');
+    req.set('Access-Control-Allow-Origin', '*');
+    req.end(function(err, response) {
+      self.setState({
+        listIsos: response.body,
+        selectedIso: response.body[0],
+      });
+    });
+  },
+
+  handleChange(e, i, value) {
+    this.setState({selectedIso: value})
+  },
+
   onDropCB(type) {
-    let newLoadingState = this.state.loadingState;
-    if (type === 'vdb') {
-      newLoadingState.VDBLoaded = true;
-    } else if (type === 'spi') {
-      newLoadingState.SPILoaded = true;
-    } else if (type === 'pdms') {
-      newLoadingState.PDMSLoaded = true;
-    } else if (type === 'pMIFU') {
-      newLoadingState.previousMIFULoaded = true;
+    if (type === 'bom') {
+      this.getListIso();
     }
-    this.setState({loadingState: newLoadingState});
+    this.props.onDropCB(type);
   },
 
   render() {
 
     const self = this;
 
-    let dropDivs = self.props.filesToUpload.map(function(fType) {
+    if (self.props.filesToUpload === undefined) {
       return (
-        <DropDiv fType={fType} loadingState={self.state.loadingState} key={fType} onDropCB={self.onDropCB} />
-      );
-    });
-
-    let MIFUbutton = '';
-
-    if (self.state.loadingState.VDBLoaded && self.state.loadingState.SPILoaded && self.state.loadingState.PDMSLoaded) {
-      if ((self.props.filesToUpload.indexOf('pMIFU') === -1) || self.state.loadingState.previousMIFULoaded)
-      MIFUbutton = (
-        <RaisedButton linkButton={true} href="http://localhost:8888/genMIFU" secondary={true} label="Download MIFU Report" />
-      );
-    };
-
-    return (
-      <div>
-        <div style={containerStyle}><h1>Please upload your files</h1></div>
-        {dropDivs}
-        <div style={containerStyle}>
-          {MIFUbutton}
+        <div>
         </div>
-      </div>
-    );
+      );
+    } else {
+
+      let dropDivs = self.props.filesToUpload.map(function(fType) {
+        return (
+          <DropDiv fType={fType} loadingState={self.props.filesLoaded} key={fType} onDropCB={self.onDropCB} />
+        );
+      });
+
+      let MIFUbutton = '';
+
+      if (self.props.filesLoaded['ALL'] === true) {
+        if (self.props.type === 'MIFUinit' || self.props.type === 'MIFUupdate') {
+          MIFUbutton = (
+            <RaisedButton linkButton={true} href="http://localhost:8888/genMIFU" secondary={true} label="Download MIFU Report" />
+          );
+        } else if (self.props.type === 'IsoStatus') {
+          MIFUbutton = (
+            <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
+          );
+        } else if (self.props.type === 'SingleIsoStatus') {
+
+          if (self.state.listIsos !== []) {
+            let menuItems = self.state.listIsos.map(function(iso) {
+              return (
+                <MenuItem value={iso} key={iso} primaryText={iso}/>
+              );
+            });
+
+            if (self.state.selectedIso !== '') {
+              MIFUbutton = (
+                <div>
+                  <DropDownMenu maxHeight={300} value={self.state.selectedIso} onChange={this.handleChange}>
+                    {menuItems}
+                  </DropDownMenu>
+                  <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
+                </div>
+              );
+            }
+          }
+        }
+      };
+
+      return (
+        <div>
+          <div style={containerStyle}><h1>Please upload your files</h1></div>
+            {dropDivs}
+          <div style={containerStyle}>
+            {MIFUbutton}
+          </div>
+        </div>
+      );
+    }
   },
 });
+
+
 
 export default MIFUComponent;
