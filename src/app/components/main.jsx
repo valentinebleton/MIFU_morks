@@ -5,9 +5,10 @@ import request from 'superagent';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+
 //import imgPath from 'test.jpg';
 
-const imgPath = require('./test.jpg');
+const imgPath = require('./logo.png');
 
 import MIFUComponent from './MIFUComponent';
 
