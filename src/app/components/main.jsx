@@ -5,12 +5,12 @@ import request from 'superagent';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
+import MIFUComponent from './MIFUComponent';
 
-//import imgPath from 'test.jpg';
+import { connect } from 'react-redux';
+import { changeTab } from '../ducks/mainDuck';
 
 const imgPath = require('./logo.png');
-
-import MIFUComponent from './MIFUComponent';
 
 const containerStyle = {
   textAlign: 'center',
@@ -26,67 +26,33 @@ const divStyle = {
 
 const Main = React.createClass({
 
-  getInitialState() {
-    return {
-      tabValue: 'MIFUupdate',
-      loadingState: {
-        vdb: false,
-        spi: false,
-        pdms: false,
-        pMIFU: false,
-        bom: false,
-        impactedIso: false,
-        ALL: false,
-      },
-      filesNeeded: {
-        MIFUinit: ['vdb', 'spi', 'pdms'],
-        MIFUupdate: ['vdb', 'spi', 'pdms', 'pMIFU'],
-        IsoStatus: ['vdb', 'spi', 'pdms', 'pMIFU', 'bom', 'impactedIso'],
-        SingleIsoStatus: ['vdb', 'spi', 'pdms', 'pMIFU', 'bom', 'impactedIso'],
-      },
-    };
-  },
-
   handleTabChange(value) {
     if (typeof value !== 'object') {
-      this.setState({
-        tabValue: value,
-      });
+      this.props.dispatch(changeTab(value));
     }
-  },
-
-  onDropCB(type) {
-    let newLoadingState = this.state.loadingState;
-    newLoadingState[type] = true;
-    newLoadingState['ALL'] = true;
-    this.state.filesNeeded[this.state.tabValue].forEach(function(fileType) {
-      if (newLoadingState[fileType] === false) {
-        newLoadingState['ALL'] = false;
-      }
-    });
-    this.setState({loadingState: newLoadingState});
   },
 
   render() {
 
     const self = this;
+    const { tabValue } = this.props;
 
     return (
       <div>
         <img src={imgPath} alt='header' />
         <div style={containerStyle}><h1>EasyIso</h1></div>
-        <Tabs value={this.state.tabValue} onChange={this.handleTabChange}>
+        <Tabs value={tabValue} onChange={this.handleTabChange}>
           <Tab label='Instrum Status Initialisation' value='MIFUinit' >
-            <MIFUComponent type='MIFUinit' filesLoaded={self.state.loadingState} filesToUpload={self.state.filesNeeded.MIFUinit} onDropCB={self.onDropCB}/>
+            <MIFUComponent type='MIFUinit' />
           </Tab>
           <Tab label='Instrum Status update' value='MIFUupdate' >
-            <MIFUComponent type='MIFUupdate' filesLoaded={self.state.loadingState}  filesToUpload={self.state.filesNeeded.MIFUupdate} onDropCB={self.onDropCB}/>
+            <MIFUComponent type='MIFUupdate' />
           </Tab>
           <Tab label='Global Iso status' value='IsoStatus' >
-            <MIFUComponent type='IsoStatus' filesLoaded={self.state.loadingState}  filesToUpload={self.state.filesNeeded.IsoStatus} onDropCB={self.onDropCB}/>
+            <MIFUComponent type='IsoStatus' />
           </Tab>
           <Tab label='Single Iso status' value='SingleIsoStatus' >
-            <MIFUComponent type='SingleIsoStatus' filesLoaded={self.state.loadingState}  filesToUpload={self.state.filesNeeded.SingleIsoStatus} onDropCB={self.onDropCB}/>
+            <MIFUComponent type='SingleIsoStatus' />
           </Tab>
         </Tabs>
       </div>
@@ -95,4 +61,10 @@ const Main = React.createClass({
   },
 });
 
-export default Main;
+const mapStateToProps = function(state) {
+  return {
+    tabValue: state.main.tabValue,
+  };
+};
+
+export default connect(mapStateToProps)(Main);

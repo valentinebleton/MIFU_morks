@@ -5,6 +5,10 @@ import request from 'superagent';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Colors from 'material-ui/lib/styles/colors';
 
+import { connect } from 'react-redux';
+import { updateLoadingState } from '../ducks/mainDuck';
+import { getListIsoAsync } from '../ducks/mainDuck';
+
 const divStyle = {
   textAlign: 'center',
   display: 'inline-block',
@@ -31,63 +35,68 @@ const dropZoneActiveStyle = {
 const DropDiv = React.createClass({
 
   onDrop(files, type) {
-    let self = this;
+    const self = this;
     let req = request.post('http://localhost:8888/uploadSourceFile');
     req.set('Access-Control-Allow-Origin', '*');
     files.forEach(function(file) {
       req.attach('file', file, file.name);
     });
     req.end(function(err, response) {
-      self.props.onDropCB(type);
+      self.props.dispatch(updateLoadingState(type));
+      if (type === 'bom') {
+        self.props.dispatch(getListIsoAsync());
+      }
     });
   },
 
   render() {
 
     const self = this;
+    const { vdb, spi, pdms, pMIFU, bom, impactedIso } = this.props;
+    const fType = this.props.fType;
 
     let fName = '';
     let message = '';
     let style = dropZoneStyle;
-    if (this.props.fType === 'vdb') {
+    if (fType === 'vdb') {
       fName = 'VDB';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.vdb === true) {
+      if (vdb === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
-    } else if (this.props.fType === 'spi') {
+    } else if (fType === 'spi') {
       fName = 'SPI';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.spi === true) {
+      if (spi === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
-    } else if (this.props.fType === 'pdms') {
+    } else if (fType === 'pdms') {
       fName = 'PDMS';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.pdms === true) {
+      if (pdms === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
-    } else if (this.props.fType === 'pMIFU') {
+    } else if (fType === 'pMIFU') {
       fName = 'prev. inst. status';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.pMIFU === true) {
+      if (pMIFU === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
-    } else if (this.props.fType === 'bom') {
+    } else if (fType === 'bom') {
       fName = 'BOM';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.bom === true) {
+      if (bom === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
-    } else if (this.props.fType === 'impactedIso') {
+    } else if (fType === 'impactedIso') {
       fName = 'Impacted isos';
       message = 'Upload '+fName+' File Here';
-      if (self.props.loadingState.impactedIso === true) {
+      if (impactedIso === true) {
         style= dropZoneActiveStyle;
         message = fName+' File Uploaded !';
       }
@@ -96,7 +105,7 @@ const DropDiv = React.createClass({
     return (
       <div style={divStyle}>
         <h2>{fName} File</h2>
-        <Dropzone onDrop={function(files) {self.onDrop(files, self.props.fType)}} style={style}>
+        <Dropzone onDrop={function(files) {self.onDrop(files, fType)}} style={style}>
           <div>{message}</div>
         </Dropzone>
       </div>
@@ -104,4 +113,15 @@ const DropDiv = React.createClass({
   },
 });
 
-export default DropDiv;
+const mapStateToProps = function(state) {
+  return {
+    vdb: state.main.loadingState.vdb,
+    spi: state.main.loadingState.spi,
+    pdms: state.main.loadingState.pdms,
+    pMIFU: state.main.loadingState.pMIFU,
+    bom: state.main.loadingState.bom,
+    impactedIso: state.main.loadingState.impactedIso,
+  };
+};
+
+export default connect(mapStateToProps)(DropDiv);

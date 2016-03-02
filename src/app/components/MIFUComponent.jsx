@@ -6,8 +6,10 @@ import RaisedButton from 'material-ui/lib/raised-button';
 import Colors from 'material-ui/lib/styles/colors';
 import DropDownMenu from 'material-ui/lib/DropDownMenu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
-
 import DropDiv from './DropDiv';
+
+import { connect } from 'react-redux';
+import { changeSelectedIso } from '../ducks/mainDuck';
 
 const containerStyle = {
   textAlign: 'center',
@@ -30,55 +32,33 @@ const MIFUComponent = React.createClass({
       console.log(err);
     });
 
-    return {
-      selectedIso: '',
-      listIsos: [],
-    };
-  },
-
-  getListIso() {
-    const self = this;
-    let req = request.get('http://localhost:8888/getIsoNameList');
-    req.set('Access-Control-Allow-Origin', '*');
-    req.end(function(err, response) {
-      self.setState({
-        listIsos: response.body,
-        selectedIso: response.body[0],
-      });
-    });
+    return {};
   },
 
   handleChange(e, i, value) {
-    this.setState({selectedIso: value})
-  },
-
-  onDropCB(type) {
-    if (type === 'bom') {
-      this.getListIso();
-    }
-    this.props.onDropCB(type);
+    this.props.dispatch(changeSelectedIso(value));
   },
 
   render() {
 
     const self = this;
 
-    if (self.props.filesToUpload === undefined) {
+    if (self.props.filesNeeded[self.props.tabValue] === undefined) {
       return (
         <div>
         </div>
       );
     } else {
 
-      let dropDivs = self.props.filesToUpload.map(function(fType) {
+      let dropDivs = self.props.filesNeeded[self.props.tabValue].map(function(fType) {
         return (
-          <DropDiv fType={fType} loadingState={self.props.filesLoaded} key={fType} onDropCB={self.onDropCB} />
+          <DropDiv fType={fType} key={fType} />
         );
       });
 
       let MIFUbutton = '';
 
-      if (self.props.filesLoaded['ALL'] === true) {
+      if (self.props.genButton === true) {
         if (self.props.type === 'MIFUinit' || self.props.type === 'MIFUupdate') {
           MIFUbutton = (
             <RaisedButton linkButton={true} href="http://localhost:8888/genMIFU" secondary={true} label="Download MIFU Report" />
@@ -88,18 +68,17 @@ const MIFUComponent = React.createClass({
             <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
           );
         } else if (self.props.type === 'SingleIsoStatus') {
-
-          if (self.state.listIsos !== []) {
-            let menuItems = self.state.listIsos.map(function(iso) {
+          if (self.props.listIsos !== undefined) {
+            let menuItems = self.props.listIsos.map(function(iso) {
               return (
                 <MenuItem value={iso} key={iso} primaryText={iso}/>
               );
             });
 
-            if (self.state.selectedIso !== '') {
+            if (self.props.selectedIso !== '') {
               MIFUbutton = (
                 <div>
-                  <DropDownMenu maxHeight={300} value={self.state.selectedIso} onChange={this.handleChange}>
+                  <DropDownMenu maxHeight={300} value={self.props.selectedIso} onChange={this.handleChange}>
                     {menuItems}
                   </DropDownMenu>
                   <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
@@ -123,6 +102,14 @@ const MIFUComponent = React.createClass({
   },
 });
 
+const mapStateToProps = function(state) {
+  return {
+    tabValue: state.main.tabValue,
+    genButton: state.main.loadingState.ALL,
+    filesNeeded: state.main.filesNeeded,
+    listIsos: state.main.listIsos,
+    selectedIso: state.main.selectedIso,
+  };
+};
 
-
-export default MIFUComponent;
+export default connect(mapStateToProps)(MIFUComponent);
