@@ -9,7 +9,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 import DropDiv from './DropDiv';
 
 import { connect } from 'react-redux';
-import { changeSelectedIso } from '../ducks/mainDuck';
+import { changeSelectedIso, updateGeneratedMIFU } from '../ducks/mainDuck';
 
 const containerStyle = {
   textAlign: 'center',
@@ -39,6 +39,18 @@ const MIFUComponent = React.createClass({
     this.props.dispatch(changeSelectedIso(value));
   },
 
+  generateMIFU() {
+    const self = this;
+    let req = request.get('http://localhost:8888/genMIFU');
+    req.set('Access-Control-Allow-Origin', '*');
+    req.end(function(err, response) {
+      console.log(err);
+      self.props.dispatch(updateGeneratedMIFU(response.body.targetPath, response.body.logsPath));
+    });
+
+    return {};
+  },
+
   render() {
 
     const self = this;
@@ -60,9 +72,22 @@ const MIFUComponent = React.createClass({
 
       if (self.props.genButton === true) {
         if (self.props.type === 'MIFUinit' || self.props.type === 'MIFUupdate') {
-          MIFUbutton = (
-            <RaisedButton linkButton={true} href="http://localhost:8888/genMIFU" secondary={true} label="Download MIFU Report" />
-          );
+
+          if (!self.props.generatedFiles.MIFU.done) {
+            MIFUbutton = (
+              <div>
+                <RaisedButton linkButton={true} onClick={self.generateMIFU} secondary={true} label="Generate MIFU Report" />
+              </div>
+            );
+          } else {
+            MIFUbutton = (
+              <div>
+                <RaisedButton linkButton={true} href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.targetPath} secondary={true} label="Download MIFU Report" />
+                <RaisedButton linkButton={true} href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.logsPath} secondary={true} label="Download MIFU Logs" />
+              </div>
+            );
+          }
+
         } else if (self.props.type === 'IsoStatus') {
           MIFUbutton = (
             <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
@@ -109,6 +134,7 @@ const mapStateToProps = function(state) {
     filesNeeded: state.main.filesNeeded,
     listIsos: state.main.listIsos,
     selectedIso: state.main.selectedIso,
+    generatedFiles: state.main.generatedFiles,
   };
 };
 

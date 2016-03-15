@@ -6,19 +6,20 @@ const instrumentHelpers = require('./helpers/instrumentHelpers.js');
 const vendorDocHelpers = require('./helpers/vendorDocHelpers.js');
 const g = require('./helpers/globalHelpers.js');
 const log4js = require('log4js');
-log4js.configure({
-  appenders: [
-    { type: 'console' },
-    { type: 'file',
-      filename: './output/reportErrorsNew.log',
-      category: 'mifu',
-    },
-  ]
-});
 
-let generateMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath) {
+let generateMIFU = function(vdbPath, spiPath, pdmsPath, previousMIFUPath, targetPath, logsFile) {
 
-  let logger = log4js.getLogger('lostData');
+  log4js.configure({
+    appenders: [
+      { type: 'console' },
+      { type: 'file',
+        filename: logsFile,
+        category: 'mifu',
+      },
+    ]
+  });
+
+  let logger = log4js.getLogger('mifu');
   logger.setLevel('ALL');
 
   let vdbWorkbook = XLSX.readFileSync(vdbPath);

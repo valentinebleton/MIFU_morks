@@ -45,12 +45,26 @@ expressApp.get('/genMIFU', function (req, res) {
   var previousMIFUPath = __dirname + '/workdir/input/previous_MIFU.xlsx';
 
   var MIFUtargetPath = __dirname + '/workdir/output/newMIFU.xlsx';
+  var MIFULogsFile = __dirname + '/workdir/logs/reportErrorsNew.log';
 
-  var statusMIFU = MIFU.generateMIFU(vdbPath, spiPath, pdmsPath, previousMIFUPath, MIFUtargetPath);
+  var statusMIFU = MIFU.generateMIFU(vdbPath, spiPath, pdmsPath, previousMIFUPath, MIFUtargetPath, MIFULogsFile);
 
-  res.download(targetPath); // Set disposition and send it.
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.send({
+    targetPath: '/workdir/output/newMIFU.xlsx',
+    logsPath: '/workdir/logs/reportErrorsNew.log',
+  });
+
+  res.status(200).end();
 
 });
+
+expressApp.get('/getFile', function (req, res) {
+
+  res.download(__dirname + req.query.pathName);
+
+});
+
 
 expressApp.get('/genISOS', function (req, res) {
   var vdbPath = __dirname + '/workdir/input/Extrait_VDB.xlsx';

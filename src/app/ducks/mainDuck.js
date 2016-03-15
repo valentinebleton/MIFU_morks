@@ -5,6 +5,7 @@ const CHANGE_TAB = 'MIFU/main/CHANGE_TAB';
 const CHANGE_SELECTED_ISO = 'MIFU/main/CHANGE_SELECTED_ISO';
 const UPDATE_LOADING_STATE = 'MIFU/main/UPDATE_LOADING_STATE';
 const GET_LIST_ISO = 'MIFU/main/GET_LIST_ISO';
+const UPDATE_GENERATED_MIFU = 'MIFU/main/UPDATE_GENERATED_MIFU';
 
 const initialState = {
   tabValue: 'MIFUupdate',
@@ -22,6 +23,13 @@ const initialState = {
     MIFUupdate: ['vdb', 'spi', 'pdms', 'pMIFU'],
     IsoStatus: ['vdb', 'spi', 'pdms', 'pMIFU', 'bom', 'impactedIso'],
     SingleIsoStatus: ['vdb', 'spi', 'pdms', 'pMIFU', 'bom', 'impactedIso'],
+  },
+  generatedFiles: {
+    MIFU: {
+      done: false,
+      targetPath: '',
+      logsPath: '',
+    },
   },
   selectedIso: '',
   listIsos: [],
@@ -57,6 +65,17 @@ export default function main(state = initialState, action = {}) {
       return {
         ...state,
         selectedIso: action.value,
+      };
+    case UPDATE_GENERATED_MIFU:
+      return {
+        ...state,
+        generatedFiles: {
+          MIFU: {
+            done: true,
+            targetPath: action.targetPath,
+            logsPath: action.logsPath,
+          },
+        },
       };
     default:
       return {
@@ -100,4 +119,12 @@ export function getListIsoAsync() {
       });
     });
   }
+}
+
+export function updateGeneratedMIFU(targetPath, logsPath) {
+  return {
+    type: UPDATE_GENERATED_MIFU,
+    targetPath,
+    logsPath,
+  };
 }

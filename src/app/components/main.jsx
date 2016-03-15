@@ -40,7 +40,7 @@ const Main = React.createClass({
     return (
       <div>
         <img src={imgPath} alt='header' />
-        <div style={containerStyle}><h1>EasyIso</h1></div>
+        <div style={containerStyle}><h1>SMART Iso</h1></div>
         <Tabs value={tabValue} onChange={this.handleTabChange}>
           <Tab label='Instrum Status Initialisation' value='MIFUinit' >
             <MIFUComponent type='MIFUinit' />
