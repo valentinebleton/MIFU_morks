@@ -53,6 +53,11 @@ var config = {
         test: /\.(png|jpg)$/,
         loader: 'file-loader'
       },
+      {
+        //loader for css
+        test: /\.css$/,
+        loader: "style-loader!css-loader"
+      },
     ]
   },
   //Eslint config

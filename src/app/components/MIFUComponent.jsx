@@ -1,12 +1,11 @@
 
 import React from 'react';
-import Dropzone from 'react-dropzone';
 import request from 'superagent';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Colors from 'material-ui/lib/styles/colors';
-import DropDownMenu from 'material-ui/lib/DropDownMenu';
-import MenuItem from 'material-ui/lib/menus/menu-item';
+import Button from 'react-bootstrap/lib/Button';
 import DropDiv from './DropDiv';
+
+import 'react-virtualized-select/styles.css';
+import VirtualizedSelect from 'react-virtualized-select';
 
 import { connect } from 'react-redux';
 import { changeSelectedIso, updateGeneratedMIFU } from '../ducks/mainDuck';
@@ -76,37 +75,41 @@ const MIFUComponent = React.createClass({
           if (!self.props.generatedFiles.MIFU.done) {
             MIFUbutton = (
               <div>
-                <RaisedButton linkButton={true} onClick={self.generateMIFU} secondary={true} label="Generate MIFU Report" />
+                <Button onClick={self.generateMIFU} bsStyle="primary">Generate MIFU Report</Button>
               </div>
             );
           } else {
             MIFUbutton = (
               <div>
-                <RaisedButton linkButton={true} href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.targetPath} secondary={true} label="Download MIFU Report" />
-                <RaisedButton linkButton={true} href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.logsPath} secondary={true} label="Download MIFU Logs" />
+                <Button href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.targetPath} bsStyle="primary">Download MIFU Report</Button>
+                <Button href={"http://localhost:8888/getFile?pathName="+self.props.generatedFiles.MIFU.logsPath} bsStyle="primary">Download MIFU Logs</Button>
               </div>
             );
           }
 
         } else if (self.props.type === 'IsoStatus') {
           MIFUbutton = (
-            <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
+            <Button href="http://localhost:8888/genISOS" bsStyle="primary">Download ISO Report</Button>
           );
         } else if (self.props.type === 'SingleIsoStatus') {
+
           if (self.props.listIsos !== undefined) {
-            let menuItems = self.props.listIsos.map(function(iso) {
-              return (
-                <MenuItem value={iso} key={iso} primaryText={iso}/>
-              );
+            let options = self.props.listIsos.map(function(iso) {
+              return {
+                value: iso,
+                label: iso,
+              };
             });
 
             if (self.props.selectedIso !== '') {
               MIFUbutton = (
                 <div>
-                  <DropDownMenu maxHeight={300} value={self.props.selectedIso} onChange={this.handleChange}>
-                    {menuItems}
-                  </DropDownMenu>
-                  <RaisedButton linkButton={true} href="http://localhost:8888/genISOS" secondary={true} label="Download ISO Report" />
+                  <VirtualizedSelect
+                    options={options}
+                    onChange={(selectValue) => this.props.dispatch(changeSelectedIso(selectValue.value))}
+                    value={self.props.selectedIso}
+                  />
+                  <Button href="http://localhost:8888/genISOS" bsStyle="primary">Download ISO Report</Button>
                 </div>
               );
             }

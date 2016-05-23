@@ -2,8 +2,6 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 import request from 'superagent';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Colors from 'material-ui/lib/styles/colors';
 
 import { connect } from 'react-redux';
 import { updateLoadingState } from '../ducks/mainDuck';
@@ -28,7 +26,7 @@ const dropZoneActiveStyle = {
   height: 40,
   width: 200,
   borderRadius: 10,
-  backgroundColor: Colors.cyan800,
+  backgroundColor: 'blue',
   color: 'white',
 };
 

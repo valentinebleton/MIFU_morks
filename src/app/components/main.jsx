@@ -1,11 +1,8 @@
 
 import React from 'react';
-import Dropzone from 'react-dropzone';
-import request from 'superagent';
-import RaisedButton from 'material-ui/lib/raised-button';
-import Tabs from 'material-ui/lib/tabs/tabs';
-import Tab from 'material-ui/lib/tabs/tab';
 import MIFUComponent from './MIFUComponent';
+import Nav from 'react-bootstrap/lib/Nav';
+import NavItem from 'react-bootstrap/lib/NavItem';
 
 import { connect } from 'react-redux';
 import { changeTab } from '../ducks/mainDuck';
@@ -41,20 +38,13 @@ const Main = React.createClass({
       <div>
         <img src={imgPath} alt='header' />
         <div style={containerStyle}><h1>SMART Iso</h1></div>
-        <Tabs value={tabValue} onChange={this.handleTabChange}>
-          <Tab label='Instrum Status Initialisation' value='MIFUinit' >
-            <MIFUComponent type='MIFUinit' />
-          </Tab>
-          <Tab label='Instrum Status update' value='MIFUupdate' >
-            <MIFUComponent type='MIFUupdate' />
-          </Tab>
-          <Tab label='Global Iso status' value='IsoStatus' >
-            <MIFUComponent type='IsoStatus' />
-          </Tab>
-          <Tab label='Single Iso status' value='SingleIsoStatus' >
-            <MIFUComponent type='SingleIsoStatus' />
-          </Tab>
-        </Tabs>
+          <Nav bsStyle="tabs" justified activeKey={tabValue} onSelect={this.handleTabChange}>
+            <NavItem eventKey={'MIFUinit'} >Instrum Status Initialisation</NavItem>
+            <NavItem eventKey={'MIFUupdate'} >Instrum Status update</NavItem>
+            <NavItem eventKey={'IsoStatus'} >Global Iso status</NavItem>
+            <NavItem eventKey={'SingleIsoStatus'} >Single Iso status</NavItem>
+          </Nav>
+          <MIFUComponent type={tabValue} />
       </div>
 
     );
